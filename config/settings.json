@@ -1,0 +1,77 @@
+{
+  "app": {
+    "name": "SwipeClean",
+    "version": "1.0.0",
+    "debug": true,
+    "port": 5000,
+    "host": "0.0.0.0"
+  },
+  "ai": {
+    "enabled": true,
+    "confidence_threshold": 0.8,
+    "blur_detection_enabled": true,
+    "duplicate_detection_enabled": true,
+    "screenshot_detection_enabled": true,
+    "old_file_detection_days": 30
+  },
+  "storage": {
+    "scan_directories": [
+      "/storage/emulated/0/DCIM",
+      "/storage/emulated/0/Download",
+      "/storage/emulated/0/Pictures"
+    ],
+    "exclude_directories": [
+      "/storage/emulated/0/Android",
+      "/storage/emulated/0/.thumbnails"
+    ],
+    "max_file_size_mb": 100,
+    "min_free_space_mb": 500
+  },
+  "ui": {
+    "theme": "light",
+    "animations_enabled": true,
+    "swipe_threshold": 100,
+    "cards_preload_count": 3,
+    "show_file_info": true,
+    "confirm_deletions": true
+  },
+  "cloud": {
+    "auto_sync": false,
+    "providers": {
+      "google_drive": {
+        "enabled": false,
+        "folder": "SwipeClean"
+      },
+      "onedrive": {
+        "enabled": false,
+        "folder": "Apps/SwipeClean"
+      },
+      "dropbox": {
+        "enabled": false,
+        "folder": "/SwipeClean"
+      }
+    }
+  },
+  "notifications": {
+    "enabled": true,
+    "cleaning_reminders": true,
+    "storage_warnings": true,
+    "sync_status": false
+  },
+  "privacy": {
+    "analytics_enabled": false,
+    "crash_reporting": true,
+    "data_collection": "minimal"
+  },
+  "performance": {
+    "thumbnail_quality": "medium",
+    "cache_size_mb": 50,
+    "concurrent_operations": 3,
+    "background_processing": true
+  },
+  "security": {
+    "require_confirmation": true,
+    "secure_delete": false,
+    "backup_before_delete": false
+  }
+}

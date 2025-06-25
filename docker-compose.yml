@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  swipeclean-app:
+    build: .
+    container_name: swipeclean
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./frontend:/app/frontend
+      - ./backend:/app/backend
+      - ./config:/app/config
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONPATH=/app
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - swipeclean-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: swipeclean-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - swipeclean-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: swipeclean-db
+    environment:
+      - POSTGRES_DB=swipeclean
+      - POSTGRES_USER=swipeclean
+      - POSTGRES_PASSWORD=swipeclean123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - swipeclean-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: swipeclean-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - swipeclean-app
+    networks:
+      - swipeclean-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  swipeclean-network:
+    driver: bridge
