@@ -1,0 +1,126 @@
+.onboarding-container {
+  background-color: #F3F4F6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.skip-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+}
+
+.skip-button a {
+  color: #8B5CF6;
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.skip-button a:hover {
+  color: #6D28D9;
+}
+
+.carousel {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 300%;
+}
+
+.carousel-slide {
+  width: 33.33%;
+  text-align: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.slide-image {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.slide-title {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.slide-text {
+  color: #4B5563;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.get-started-button {
+  background-color: #8B5CF6;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.get-started-button:hover {
+  background-color: #6D28D9;
+  transform: scale(1.05);
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #D1D5DB;
+  border-radius: 50%;
+  margin: 0 6px;
+  transition: background-color 0.3s ease;
+}
+
+.dot.active {
+  background-color: #8B5CF6;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.carousel-slide.active {
+  animation: slideIn 0.5s ease-in-out forwards;
+}
+
+/* Utility */
+.hidden {
+  display: none;
+}

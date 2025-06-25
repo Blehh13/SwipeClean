@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwipeClean - Home</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/splash.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash-screen">
+    <img src="assets/logo.png" alt="SwipeClean Logo" class="logo">
+    <h1>SwipeClean</h1>
+    <p>Swipe away your storage clutter</p>
+  </div>
+
+  <!-- Onboarding Screens -->
+  <div id="onboarding-screen" class="onboarding-screen" style="display: none;">
+    <div class="carousel">
+      <div class="slide active" data-slide="0">
+        <img src="assets/icons/gesture.svg" alt="Gesture Icon">
+        <h2>Swipe to clean files</h2>
+        <p>Swipe left to delete, right to keep files</p>
+        <div class="animation" id="swipe-animation"></div>
+      </div>
+      <div class="slide" data-slide="1">
+        <img src="assets/icons/zap.svg" alt="Zap Icon">
+        <h2>Smart AI suggestions</h2>
+        <p>Our AI finds blurry photos, duplicates, and old screenshots</p>
+        <div class="animation" id="suggestions-animation"></div>
+      </div>
+      <div class="slide" data-slide="2">
+        <img src="assets/icons/hard-drive.svg" alt="Hard Drive Icon">
+        <h2>Free up storage in minutes</h2>
+        <p>Clean your storage quickly and safely</p>
+        <div class="animation" id="storage-animation"></div>
+      </div>
+    </div>
+    <div class="progress-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+    <a href="#" class="skip-link" onclick="skipOnboarding()">Skip</a>
+    <button class="get-started-btn" onclick="startApp()" style="display: none;">Get Started</button>
+  </div>
+
+  <!-- Home Screen -->
+  <div id="home-screen" class="home-screen" style="display: none;">
+    <div class="top-bar">
+      <img src="assets/logo.png" alt="Logo" class="top-logo">
+      <span id="storage-info">Loading storage...</span>
+    </div>
+    <div class="main-content">
+      <button class="action-btn violet" onclick="window.location.href='/swipe'">Start Cleaning</button>
+      <button class="action-btn blue" onclick="window.location.href='/suggestions'">Smart Scan</button>
+      <button class="action-btn gray" onclick="window.location.href='/browser'">Browse Files</button>
+      <button class="action-btn gray" onclick="window.location.href='/settings'">Settings</button>
+    </div>
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active" data-nav="home"><img src="assets/icons/home.svg" alt="Home">Home</a>
+      <a href="/swipe" class="nav-item" data-nav="gallery"><img src="assets/icons/gallery.svg" alt="Gallery">Gallery</a>
+      <a href="/suggestions" class="nav-item" data-nav="suggestions"><img src="assets/icons/suggestions.svg" alt="Suggestions">Suggestions</a>
+      <a href="/browser" class="nav-item" data-nav="files"><img src="assets/icons/files.svg" alt="Files">Files</a>
+      <a href="/settings" class="nav-item" data-nav="settings"><img src="assets/icons/settings.svg" alt="Settings">Settings</a>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    const splashState = { isAnimating: true, redirectTarget: '' };
+    const isFirstTimeUser = !localStorage.getItem('hasOnboarded');
+    let currentSlide = 0;
+
+    function initSplash() {
+      if (!isFirstTimeUser) {
+        setTimeout(() => {
+          document.getElementById('splash-screen').style.display = 'none';
+          document.getElementById('home-screen').style.display = 'block';
+          loadStorageInfo();
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          document.getElementById('splash-screen').style.display = 'none';
+          document.getElementById('onboarding-screen').style.display = 'block';
+          initCarousel();
+        }, 2000);
+      }
+    }
+
+    function initCarousel() {
+      lottie.loadAnimation({
+        container: document.getElementById('swipe-animation'),
+        path: 'assets/animations/swipe.json',
+        renderer: 'svg',
+        loop: true,
+        autoplay: true
+      });
+      const slides = document.querySelectorAll('.slide');
+      const dots = document.querySelectorAll('.progress-dots .dot');
+      slides.forEach((slide, index) => {
+        slide.style.transform = `translateX(${index * 100}%)`;
+      });
+      document.querySelector('.carousel').addEventListener('touchstart', handleTouchStart);
+      document.querySelector('.carousel').addEventListener('touchend', handleTouchEnd);
+      updateCarousel();
+    }
+
+    let touchStartX = 0;
+    function handleTouchStart(e) {
+      touchStartX = e.touches[0].clientX;
+    }
+
+    function handleTouchEnd(e) {
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      if (deltaX > 50 && currentSlide > 0) {
+        currentSlide--;
+      } else if (deltaX < -50 && currentSlide < 2) {
+        currentSlide++;
+      }
+      updateCarousel();
+    }
+
+    function updateCarousel() {
+      const slides = document.querySelectorAll('.slide');
+      const dots = document.querySelectorAll('.progress-dots .dot');
+      slides.forEach((slide, index) => {
+        slide.style.transform = `translateX(${(index - currentSlide) * 100}%)`;
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      dots.forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
+      document.querySelector('.get-started-btn').style.display = currentSlide === 2 ? 'block' : 'none';
+    }
+
+    function skipOnboarding() {
+      localStorage.setItem('hasOnboarded', true);
+      window.location.href = '/permissions';
+    }
+
+    function startApp() {
+      localStorage.setItem('hasOnboarded', true);
+      window.location.href = '/permissions';
+    }
+
+    async function loadStorageInfo() {
+      const response = await fetch('/api/storage/info');
+      const data = await response.json();
+      document.getElementById('storage-info').textContent = `${data.used} GB of ${data.total} GB used`;
+    }
+
+    initSplash();
+  </script>
+</body>
+</html>

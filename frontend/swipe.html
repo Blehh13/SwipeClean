@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwipeClean - Swipe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/swipe.css">
+</head>
+<body>
+  <div class="swipe-container">
+    <div class="top-bar">
+      <a href="index.html" class="back-button">
+        <img src="assets/icons/back.svg" alt="Back" class="back-icon">
+      </a>
+      <span id="progress-indicator">0 / 0 files</span>
+    </div>
+    <div class="swipe-area">
+      <div id="card-stack" class="card-stack"></div>
+      <div class="swipe-label delete">Delete</div>
+      <div class="swipe-label keep">Keep</div>
+    </div>
+    <div class="action-buttons">
+      <button id="delete-button" class="action-button delete">Delete</button>
+      <button id="keep-button" class="action-button keep">Keep</button>
+    </div>
+  </div>
+  <script src="js/swipe.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwipeClean - Insights</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/insights.css">
+</head>
+<body>
+  <div class="insights-container">
+    <div class="top-bar">
+      <a href="index.html" class="back-button">
+        <img src="assets/icons/back.svg" alt="Back" class="back-icon">
+      </a>
+      <h1>Storage Insights</h1>
+    </div>
+    <div class="insights-content">
+      <div class="chart-section">
+        <h2>Storage Breakdown</h2>
+        <canvas id="storage-chart"></canvas>
+      </div>
+      <div class="summary-section">
+        <div class="summary-card">
+          <h3>Total Cleaned</h3>
+          <p id="total-cleaned">0 MB</p>
+        </div>
+        <div class="summary-card">
+          <h3>Largest File</h3>
+          <p id="largest-file">None</p>
+        </div>
+        <div class="summary-card">
+          <h3>Files Scanned</h3>
+          <p id="files-scanned">0</p>
+        </div>
+      </div>
+      <button id="refresh-insights" class="action-button">Refresh Insights</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="js/insights.js"></script>
+</body>
+</html>
