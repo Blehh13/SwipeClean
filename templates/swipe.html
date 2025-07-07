@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - Swipe{% endblock %}
+
+{% block styles %}
+<style>
+    .swipe-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .swipe-header {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-area {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 2rem;
+    }
+
+    .card {
+        width: 280px;
+        height: 400px;
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden;
+        position: relative;
+        cursor: grab;
+        transition: transform 0.3s ease;
+    }
+
+    .card:active {
+        cursor: grabbing;
+    }
+
+    .card img {
+        width: 100%;
+        height: 70%;
+        object-fit: cover;
+    }
+
+    .card-info {
+        padding: 1rem;
+        height: 30%;
+    }
+
+    .card-info h3 {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .card-info p {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0.25rem 0;
+    }
+
+    .swipe-labels {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .label-delete {
+        left: 2rem;
+        background: #ef4444;
+        color: white;
+    }
+
+    .label-keep {
+        right: 2rem;
+        background: #10b981;
+        color: white;
+    }
+
+    .swipe-labels.visible {
+        opacity: 1;
+    }
+
+    .controls {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-around;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .control-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .control-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-delete { background: #ef4444; color: white; }
+    .btn-keep { background: #10b981; color: white; }
+    .btn-skip { background: #f59e0b; color: white; }
+
+    .no-files {
+        text-align: center;
+        color: #64748b;
+        font-size: 1.25rem;
+    }
+
+    .card.swipe-left {
+        transform: translateX(-100%) rotate(-30deg);
+        opacity: 0;
+    }
+
+    .card.swipe-right {
+        transform: translateX(100%) rotate(30deg);
+        opacity: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="swipe-container">
+    <div class="swipe-header">
+        <button class="back-btn" onclick="location.href='/'">←</button>
+        <h2>Clean Files</h2>
+        <span id="progress">0/0</span>
+    </div>
+    
+    <div class="card-area">
+        <div id="card-stack"></div>
+        <div class="swipe-labels label-delete">DELETE</div>
+        <div class="swipe-labels label-keep">KEEP</div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn btn-delete" onclick="swipeCard('delete')">🗑️</button>
+        <button class="control-btn btn-skip" onclick="swipeCard('skip')">⏭️</button>
+        <button class="control-btn btn-keep" onclick="swipeCard('keep')">✅</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let files = [];
+    let currentIndex = 0;
+    let isDragging = false;
+    let startX = 0;
+
+    async function loadFiles() {
+        try {
+            const response = await fetch('/api/files');
+            const data = await response.json();
+            files = data.files;
+            renderCard();
+        } catch (error) {
+            console.error('Failed to load files:', error);
+        }
+    }
+
+    function renderCard() {
+        const cardStack = document.getElementById('card-stack');
+        const progress = document.getElementById('progress');
+        
+        progress.textContent = `${currentIndex + 1}/${files.length}`;
+        
+        if (currentIndex >= files.length) {
+            cardStack.innerHTML = '<div class="no-files">🎉 All files processed!</div>';
+            return;
+        }
+        
+        const file = files[currentIndex];
+        cardStack.innerHTML = `
+            <div class="card" id="current-card">
+                <img src="${file.path}" alt="${file.name}" loading="lazy">
+                <div class="card-info">
+                    <h3>${file.name}</h3>
+                    <p>Size: ${file.size}</p>
+                    <p>Type: ${file.type}</p>
+                </div>
+            </div>
+        `;
+        
+        setupCardEvents();
+    }
+
+    function setupCardEvents() {
+        const card = document.getElementById('current-card');
+        if (!card) return;
+
+        // Touch events
+        card.addEventListener('touchstart', handleStart);
+        card.addEventListener('touchmove', handleMove);
+        card.addEventListener('touchend', handleEnd);
+        
+        // Mouse events for desktop
+        card.addEventListener('mousedown', handleStart);
+        card.addEventListener('mousemove', handleMove);
+        card.addEventListener('mouseup', handleEnd);
+        card.addEventListener('mouseleave', handleEnd);
+    }
+
+    function handleStart(e) {
+        isDragging = true;
+        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    }
+
+    function handleMove(e) {
+        if (!isDragging) return;
+        
+        e.preventDefault();
+        const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const deltaX = currentX - startX;
+        const rotation = deltaX * 0.1;
+        
+        const card = document.getElementById('current-card');
+        card.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+        
+        // Show labels
+        const deleteLabel = document.querySelector('.label-delete');
+        const keepLabel = document.querySelector('.label-keep');
+        
+        if (deltaX < -50) {
+            deleteLabel.classList.add('visible');
+            keepLabel.classList.remove('visible');
+        } else if (deltaX > 50) {
+            keepLabel.classList.add('visible');
+            deleteLabel.classList.remove('visible');
+        } else {
+            deleteLabel.classList.remove('visible');
+            keepLabel.classList.remove('visible');
+        }
+    }
+
+    function handleEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const currentX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+        const deltaX = currentX - startX;
+        
+        if (Math.abs(deltaX) > 100) {
+            swipeCard(deltaX < 0 ? 'delete' : 'keep');
+        } else {
+            // Snap back
+            const card = document.getElementById('current-card');
+            card.style.transform = '';
+            document.querySelector('.label-delete').classList.remove('visible');
+            document.querySelector('.label-keep').classList.remove('visible');
+        }
+    }
+
+    function swipeCard(action) {
+        const card = document.getElementById('current-card');
+        if (!card) return;
+        
+        const file = files[currentIndex];
+        
+        if (action === 'delete') {
+            card.classList.add('swipe-left');
+            console.log(`Deleted: ${file.name}`);
+        } else if (action === 'keep') {
+            card.classList.add('swipe-right');
+            console.log(`Kept: ${file.name}`);
+        } else if (action === 'skip') {
+            console.log(`Skipped: ${file.name}`);
+        }
+        
+        // Hide labels
+        document.querySelector('.label-delete').classList.remove('visible');
+        document.querySelector('.label-keep').classList.remove('visible');
+        
+        setTimeout(() => {
+            currentIndex++;
+            renderCard();
+        }, 300);
+    }
+
+    // Initialize
+    loadFiles();
+</script>
+{% endblock %}

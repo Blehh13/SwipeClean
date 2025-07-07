@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - Permissions{% endblock %}
+
+{% block styles %}
+<style>
+    .permissions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    }
+
+    .permission-icon {
+        font-size: 4rem;
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .permission-content {
+        opacity: 0;
+        animation: fadeInUp 0.8s ease 0.3s forwards;
+    }
+
+    .permission-content h1 {
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+
+    .permission-content p {
+        color: #64748b;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+    }
+
+    .error-message {
+        color: #ef4444;
+        margin-top: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .error-message.visible {
+        opacity: 1;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="permissions">
+    <div class="permission-icon">🔒</div>
+    <div class="permission-content">
+        <h1>Storage Permission Required</h1>
+        <p>SwipeClean needs access to your device storage to help you clean and organize your files safely.</p>
+        
+        <div class="button-group">
+            <button class="btn" onclick="grantPermission()">
+                ✅ Grant Permission
+            </button>
+            <button class="btn btn-secondary" onclick="denyPermission()">
+                ❌ Not Now
+            </button>
+        </div>
+        
+        <div id="error-message" class="error-message">
+            Permission is required for the app to function properly.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function grantPermission() {
+        localStorage.setItem('hasStoragePermission', 'true');
+        location.href = '/';
+    }
+    
+    function denyPermission() {
+        document.getElementById('error-message').classList.add('visible');
+    }
+</script>
+{% endblock %}

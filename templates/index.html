@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - Home{% endblock %}
+
+{% block styles %}
+<style>
+    .splash {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+        text-align: center;
+    }
+
+    .splash.hidden {
+        display: none;
+    }
+
+    .logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    .home-content {
+        display: none;
+    }
+
+    .home-content.active {
+        display: block;
+    }
+
+    .storage-info {
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .storage-bar {
+        background: #e2e8f0;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .storage-fill {
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+        height: 100%;
+        width: 19%;
+        transition: width 0.5s ease;
+    }
+
+    .action-grid {
+        display: grid;
+        gap: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="splash" class="splash">
+    <div class="logo">📱</div>
+    <h1>SwipeClean</h1>
+    <p>Swipe away your storage clutter</p>
+</div>
+
+<div id="home" class="home-content">
+    <div class="header">
+        <div class="logo">📱</div>
+        <h1>SwipeClean</h1>
+        <div id="storage-text">Loading...</div>
+    </div>
+    
+    <div class="content">
+        <div class="storage-info">
+            <h3>Storage Usage</h3>
+            <div class="storage-bar">
+                <div class="storage-fill"></div>
+            </div>
+            <p id="storage-details">12.4 GB of 64 GB used</p>
+        </div>
+        
+        <div class="action-grid">
+            <button class="btn" onclick="location.href='/swipe'">
+                📱 Start Cleaning
+            </button>
+            <button class="btn btn-secondary" onclick="location.href='/suggestions'">
+                💡 Smart Suggestions
+            </button>
+            <button class="btn btn-secondary" onclick="location.href='/browser'">
+                📁 Browse Files
+            </button>
+            <button class="btn btn-secondary" onclick="location.href='/settings'">
+                ⚙️ Settings
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% set show_nav = true %}
+{% set active_nav = 'home' %}
+
+{% block scripts %}
+<script>
+    // Check if first time user
+    const isFirstTime = !localStorage.getItem('hasOnboarded');
+    
+    if (isFirstTime) {
+        setTimeout(() => {
+            localStorage.setItem('hasOnboarded', 'true');
+            location.href = '/permissions';
+        }, 2000);
+    } else {
+        setTimeout(() => {
+            document.getElementById('splash').classList.add('hidden');
+            document.getElementById('home').classList.add('active');
+            loadStorageInfo();
+        }, 2000);
+    }
+    
+    async function loadStorageInfo() {
+        try {
+            const response = await fetch('/api/storage');
+            const data = await response.json();
+            document.getElementById('storage-text').textContent = `${data.used}GB`;
+            document.getElementById('storage-details').textContent = `${data.used} GB of ${data.total} GB used`;
+        } catch (error) {
+            document.getElementById('storage-text').textContent = 'N/A';
+        }
+    }
+</script>
+{% endblock %}

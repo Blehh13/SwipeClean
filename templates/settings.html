@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - Settings{% endblock %}
+
+{% block styles %}
+<style>
+    .settings-group {
+        background: white;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+
+    .setting-label {
+        font-weight: 500;
+    }
+
+    .setting-description {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+
+    .setting-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        background: #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+        background: #8b5cf6;
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+    }
+
+    .toggle-switch.active::after {
+        transform: translateX(26px);
+    }
+
+    .setting-select {
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+        min-width: 120px;
+    }
+
+    .storage-info {
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .storage-bar {
+        background: #e2e8f0;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .storage-fill {
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+        height: 100%;
+        width: 19%;
+    }
+
+    .danger-zone {
+        border: 1px solid #ef4444;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-top: 2rem;
+    }
+
+    .danger-title {
+        color: #ef4444;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <button class="back-btn" onclick="location.href='/'">←</button>
+    <h1>Settings</h1>
+    <div></div>
+</div>
+
+<div class="content">
+    <div class="storage-info">
+        <h3>Storage Usage</h3>
+        <div class="storage-bar">
+            <div class="storage-fill"></div>
+        </div>
+        <p id="storage-details">12.4 GB of 64 GB used</p>
+    </div>
+
+    <div class="settings-group">
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">Notifications</div>
+                <div class="setting-description">Get notified about cleaning suggestions</div>
+            </div>
+            <div class="toggle-switch active" onclick="toggleSetting(this, 'notifications')"></div>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">Auto-delete duplicates</div>
+                <div class="setting-description">Automatically remove duplicate files</div>
+            </div>
+            <div class="toggle-switch" onclick="toggleSetting(this, 'autoDelete')"></div>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">AI Confidence</div>
+                <div class="setting-description">Minimum confidence for suggestions</div>
+            </div>
+            <select class="setting-select" onchange="updateSetting('confidence', this.value)">
+                <option value="0.7">70%</option>
+                <option value="0.8" selected>80%</option>
+                <option value="0.9">90%</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="settings-group">
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">Theme</div>
+                <div class="setting-description">Choose app appearance</div>
+            </div>
+            <select class="setting-select" onchange="updateSetting('theme', this.value)">
+                <option value="light" selected>Light</option>
+                <option value="dark">Dark</option>
+                <option value="auto">Auto</option>
+            </select>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">Language</div>
+                <div class="setting-description">App language</div>
+            </div>
+            <select class="setting-select" onchange="updateSetting('language', this.value)">
+                <option value="en" selected>English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="danger-zone">
+        <div class="danger-title">Danger Zone</div>
+        <button class="btn btn-danger" onclick="clearAllData()">
+            🗑️ Clear All Data
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% set show_nav = true %}
+{% set active_nav = 'settings' %}
+
+{% block scripts %}
+<script>
+    function toggleSetting(element, setting) {
+        element.classList.toggle('active');
+        const isActive = element.classList.contains('active');
+        
+        console.log(`Setting ${setting} changed to:`, isActive);
+        localStorage.setItem(setting, isActive);
+    }
+
+    function updateSetting(setting, value) {
+        console.log(`Setting ${setting} changed to:`, value);
+        localStorage.setItem(setting, value);
+    }
+
+    function clearAllData() {
+        if (confirm('This will delete all app data. Are you sure?')) {
+            localStorage.clear();
+            location.href = '/permissions';
+        }
+    }
+
+    // Load saved settings
+    document.addEventListener('DOMContentLoaded', () => {
+        // Load toggle states
+        const notifications = localStorage.getItem('notifications') !== 'false';
+        const autoDelete = localStorage.getItem('autoDelete') === 'true';
+        
+        document.querySelectorAll('.toggle-switch')[0].classList.toggle('active', notifications);
+        document.querySelectorAll('.toggle-switch')[1].classList.toggle('active', autoDelete);
+        
+        // Load select values
+        const confidence = localStorage.getItem('confidence') || '0.8';
+        const theme = localStorage.getItem('theme') || 'light';
+        const language = localStorage.getItem('language') || 'en';
+        
+        document.querySelector('select[onchange*="confidence"]').value = confidence;
+        document.querySelector('select[onchange*="theme"]').value = theme;
+        document.querySelector('select[onchange*="language"]').value = language;
+    });
+</script>
+{% endblock %}

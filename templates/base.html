@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SwipeClean{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: #8b5cf6;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b, #475569);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .content {
+            padding: 1rem;
+            padding-bottom: 5rem;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        {% block content %}{% endblock %}
+        
+        {% if show_nav %}
+        <nav class="nav-bottom">
+            <a href="/" class="nav-item {% if active_nav == 'home' %}active{% endif %}">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </a>
+            <a href="/swipe" class="nav-item {% if active_nav == 'swipe' %}active{% endif %}">
+                <div class="nav-icon">📱</div>
+                <span>Swipe</span>
+            </a>
+            <a href="/suggestions" class="nav-item {% if active_nav == 'suggestions' %}active{% endif %}">
+                <div class="nav-icon">💡</div>
+                <span>Smart</span>
+            </a>
+            <a href="/browser" class="nav-item {% if active_nav == 'browser' %}active{% endif %}">
+                <div class="nav-icon">📁</div>
+                <span>Files</span>
+            </a>
+            <a href="/settings" class="nav-item {% if active_nav == 'settings' %}active{% endif %}">
+                <div class="nav-icon">⚙️</div>
+                <span>Settings</span>
+            </a>
+        </nav>
+        {% endif %}
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

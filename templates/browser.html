@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - File Browser{% endblock %}
+
+{% block styles %}
+<style>
+    .view-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .toggle-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: #8b5cf6;
+        color: white;
+        border-color: #8b5cf6;
+    }
+
+    .files-grid {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .files-grid.list {
+        grid-template-columns: 1fr;
+    }
+
+    .files-grid.grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .file-item {
+        background: white;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+        position: relative;
+    }
+
+    .file-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .file-item.list {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .file-item.grid {
+        text-align: center;
+    }
+
+    .file-item img {
+        border-radius: 0.5rem;
+    }
+
+    .file-item.list img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+
+    .file-item.grid img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+
+    .file-info {
+        flex: 1;
+    }
+
+    .file-info h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.875rem;
+    }
+
+    .file-info p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .file-item.grid .file-info {
+        padding: 0.75rem;
+    }
+
+    .file-checkbox {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 20px;
+        height: 20px;
+    }
+
+    .selection-bar {
+        position: fixed;
+        bottom: 5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: none;
+        gap: 1rem;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .selection-bar.visible {
+        display: flex;
+    }
+
+    .selection-count {
+        color: #64748b;
+        font-size: 0.875rem;
+        align-self: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <button class="back-btn" onclick="location.href='/'">←</button>
+    <h1>File Browser</h1>
+    <div></div>
+</div>
+
+<div class="content">
+    <div class="view-toggle">
+        <button class="toggle-btn active" onclick="setView('list')">📋 List</button>
+        <button class="toggle-btn" onclick="setView('grid')">⊞ Grid</button>
+    </div>
+    
+    <div id="files-container" class="files-grid list">
+        <!-- Files will be loaded here -->
+    </div>
+</div>
+
+<div id="selection-bar" class="selection-bar">
+    <span id="selection-count" class="selection-count">0 selected</span>
+    <button class="btn btn-danger" onclick="deleteSelected()">Delete</button>
+    <button class="btn" onclick="swipeSelected()">Swipe</button>
+</div>
+{% endblock %}
+
+{% set show_nav = true %}
+{% set active_nav = 'browser' %}
+
+{% block scripts %}
+<script>
+    let files = [];
+    let selectedFiles = [];
+    let currentView = 'list';
+
+    async function loadFiles() {
+        try {
+            const response = await fetch('/api/files');
+            const data = await response.json();
+            files = data.files;
+            renderFiles();
+        } catch (error) {
+            console.error('Failed to load files:', error);
+        }
+    }
+
+    function renderFiles() {
+        const container = document.getElementById('files-container');
+        container.className = `files-grid ${currentView}`;
+        
+        container.innerHTML = files.map(file => `
+            <div class="file-item ${currentView}">
+                <img src="${file.path}" alt="${file.name}" loading="lazy">
+                <div class="file-info">
+                    <h4>${file.name}</h4>
+                    <p>Size: ${file.size}</p>
+                    <p>Type: ${file.type}</p>
+                </div>
+                <input type="checkbox" class="file-checkbox" data-id="${file.id}" onchange="toggleSelection(${file.id})">
+            </div>
+        `).join('');
+    }
+
+    function setView(view) {
+        currentView = view;
+        
+        // Update toggle buttons
+        document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        renderFiles();
+    }
+
+    function toggleSelection(fileId) {
+        const index = selectedFiles.indexOf(fileId);
+        if (index > -1) {
+            selectedFiles.splice(index, 1);
+        } else {
+            selectedFiles.push(fileId);
+        }
+        
+        updateSelectionBar();
+    }
+
+    function updateSelectionBar() {
+        const selectionBar = document.getElementById('selection-bar');
+        const selectionCount = document.getElementById('selection-count');
+        
+        if (selectedFiles.length > 0) {
+            selectionBar.classList.add('visible');
+            selectionCount.textContent = `${selectedFiles.length} selected`;
+        } else {
+            selectionBar.classList.remove('visible');
+        }
+    }
+
+    function deleteSelected() {
+        if (selectedFiles.length === 0) return;
+        
+        if (confirm(`Delete ${selectedFiles.length} selected files?`)) {
+            console.log('Deleting files:', selectedFiles);
+            
+            // Remove from files array
+            files = files.filter(file => !selectedFiles.includes(file.id));
+            selectedFiles = [];
+            
+            renderFiles();
+            updateSelectionBar();
+        }
+    }
+
+    function swipeSelected() {
+        if (selectedFiles.length === 0) return;
+        
+        console.log('Opening swipe mode for files:', selectedFiles);
+        location.href = '/swipe';
+    }
+
+    // Initialize
+    loadFiles();
+</script>
+{% endblock %}

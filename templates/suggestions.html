@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}SwipeClean - Smart Suggestions{% endblock %}
+
+{% block styles %}
+<style>
+    .suggestions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .suggestion-card {
+        background: white;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+
+    .suggestion-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .suggestion-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+
+    .suggestion-info {
+        padding: 0.75rem;
+    }
+
+    .suggestion-reason {
+        font-size: 0.75rem;
+        color: #ef4444;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .suggestion-size {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .confidence-bar {
+        background: #e2e8f0;
+        height: 4px;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .confidence-fill {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .filter-bar {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .filter-select {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <button class="back-btn" onclick="location.href='/'">←</button>
+    <h1>Smart Suggestions</h1>
+    <div></div>
+</div>
+
+<div class="content">
+    <div class="filter-bar">
+        <select class="filter-select" id="filter-type">
+            <option value="all">All Types</option>
+            <option value="duplicate">Duplicates</option>
+            <option value="blurry">Blurry Images</option>
+            <option value="old">Old Screenshots</option>
+        </select>
+        <select class="filter-select" id="filter-confidence">
+            <option value="all">All Confidence</option>
+            <option value="high">High (90%+)</option>
+            <option value="medium">Medium (70%+)</option>
+        </select>
+    </div>
+    
+    <div id="suggestions-grid" class="suggestions-grid">
+        <!-- Suggestions will be loaded here -->
+    </div>
+    
+    <div class="actions">
+        <button class="btn btn-danger" onclick="deleteAll()">
+            🗑️ Delete All
+        </button>
+        <button class="btn" onclick="location.href='/swipe'">
+            👁️ Review in Swipe
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% set show_nav = true %}
+{% set active_nav = 'suggestions' %}
+
+{% block scripts %}
+<script>
+    let suggestions = [];
+    let filteredSuggestions = [];
+
+    async function loadSuggestions() {
+        try {
+            const response = await fetch('/api/suggestions');
+            const data = await response.json();
+            suggestions = data.suggestions;
+            filteredSuggestions = [...suggestions];
+            renderSuggestions();
+        } catch (error) {
+            console.error('Failed to load suggestions:', error);
+        }
+    }
+
+    function renderSuggestions() {
+        const grid = document.getElementById('suggestions-grid');
+        
+        if (filteredSuggestions.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b;">No suggestions found</div>';
+            return;
+        }
+        
+        grid.innerHTML = filteredSuggestions.map(suggestion => `
+            <div class="suggestion-card">
+                <img src="${suggestion.path}" alt="Suggestion" loading="lazy">
+                <div class="suggestion-info">
+                    <div class="suggestion-reason">${suggestion.reason}</div>
+                    <div class="suggestion-size">${suggestion.size}</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${suggestion.confidence * 100}%"></div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterSuggestions() {
+        const typeFilter = document.getElementById('filter-type').value;
+        const confidenceFilter = document.getElementById('filter-confidence').value;
+        
+        filteredSuggestions = suggestions.filter(suggestion => {
+            const typeMatch = typeFilter === 'all' || suggestion.reason.toLowerCase().includes(typeFilter);
+            const confidenceMatch = confidenceFilter === 'all' || 
+                (confidenceFilter === 'high' && suggestion.confidence >= 0.9) ||
+                (confidenceFilter === 'medium' && suggestion.confidence >= 0.7);
+            
+            return typeMatch && confidenceMatch;
+        });
+        
+        renderSuggestions();
+    }
+
+    function deleteAll() {
+        if (confirm(`Delete ${filteredSuggestions.length} suggested files?`)) {
+            console.log('Deleting all suggested files:', filteredSuggestions);
+            filteredSuggestions = [];
+            renderSuggestions();
+        }
+    }
+
+    // Event listeners
+    document.getElementById('filter-type').addEventListener('change', filterSuggestions);
+    document.getElementById('filter-confidence').addEventListener('change', filterSuggestions);
+
+    // Initialize
+    loadSuggestions();
+</script>
+{% endblock %}
