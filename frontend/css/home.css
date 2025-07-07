@@ -1,3 +1,41 @@
+.splash-screen {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.splash-screen .logo {
+  font-size: 80px;
+  margin-bottom: 16px;
+  animation: scaleUp 1.5s ease-in-out infinite alternate;
+}
+
+.splash-screen h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+.splash-screen p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
 .home-container {
   background-color: #F3F4F6;
   min-height: 100vh;
@@ -7,7 +45,7 @@
 }
 
 .top-bar {
-  background-color: #8B5CF6;
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
   height: 56px;
   display: flex;
   justify-content: space-between;
@@ -26,8 +64,7 @@
 }
 
 .top-bar-logo {
-  width: 32px;
-  height: 32px;
+  font-size: 32px;
 }
 
 .top-bar-right {
@@ -43,6 +80,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 64px;
 }
 
 .action-button {
@@ -50,25 +88,35 @@
   color: white;
   font-size: 16px;
   font-weight: 500;
-  padding: 12px;
+  padding: 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .action-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
 }
 
 .action-button.blue {
   background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.action-button.blue:hover {
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .action-button.gray {
   background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.action-button.gray:hover {
+  box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
 }
 
 .bottom-nav {
@@ -81,17 +129,19 @@
   bottom: 0;
   width: 100%;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #4B5563;
+  color: #6B7280;
   font-size: 12px;
   font-weight: 400;
   cursor: pointer;
   transition: color 0.3s ease;
+  padding: 8px;
 }
 
 .nav-item.active {
@@ -99,8 +149,7 @@
 }
 
 .nav-icon {
-  width: 24px;
-  height: 24px;
+  font-size: 20px;
   margin-bottom: 4px;
 }
 

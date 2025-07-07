@@ -4,49 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SwipeClean - Permissions</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/permissions.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="permissions-container">
-    <img src="assets/icons/lock.svg" alt="Lock Icon" class="icon">
-    <h1>We need your permission</h1>
-    <p>We need access to your media to clean your files safely.</p>
-    <button class="action-btn violet" onclick="requestPermission()">Grant Access</button>
-    <p id="error-message" style="color: red; display: none;"></p>
-    <a href="#" class="learn-more" onclick="toggleModal('permission-modal')">Learn more</a>
-  </div>
-  <div class="modal" id="permission-modal" style="display: none;">
-    <div class="modal-content">
-      <p>SwipeClean only accesses specified folders (e.g., DCIM, Downloads) and never shares your data.</p>
-      <button onclick="closeModal('permission-modal')">Close</button>
+    <div class="gradient-overlay"></div>
+    <div class="permissions-content">
+      <div class="logo">🔒</div>
+      <h1 class="title">We need your permission</h1>
+      <p class="description">We need access to your media to clean your files safely.</p>
+      <div class="button-group">
+        <button class="permission-button allow" onclick="allowPermission()">Grant Access</button>
+        <button class="permission-button deny" onclick="denyPermission()">Not Now</button>
+      </div>
+      <div id="deny-message" class="deny-message">
+        The app needs storage permission to function properly.
+      </div>
     </div>
   </div>
-  <script src="js/permissions.js"></script>
+
   <script>
-    async function requestPermission() {
-      try {
-        const response = await fetch('/api/auth/request-storage', { method: 'POST' });
-        if (response.ok) {
-          localStorage.setItem('hasStoragePermission', true);
-          window.location.href = '/home';
-        } else {
-          document.getElementById('error-message').textContent = 'Permission denied. Please try again.';
-          document.getElementById('error-message').style.display = 'block';
-        }
-      } catch (error) {
-        document.getElementById('error-message').textContent = 'Error requesting permission.';
-        document.getElementById('error-message').style.display = 'block';
-      }
+    function allowPermission() {
+      localStorage.setItem('hasStoragePermission', 'true');
+      window.location.href = '/home';
     }
 
-    function toggleModal(id) {
-      document.getElementById(id).style.display = 'block';
+    function denyPermission() {
+      document.getElementById('deny-message').classList.add('visible');
     }
 
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
+    // Apply fade-in animation
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('.permissions-content').classList.add('active');
+    });
   </script>
 </body>
 </html>

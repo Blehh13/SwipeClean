@@ -9,20 +9,23 @@
 </head>
 <body>
   <div class="swipe-container">
-    <div class="top-bar">
-      <a href="index.html" class="back-button">
-        <img src="assets/icons/back.svg" alt="Back" class="back-icon">
-      </a>
+    <div class="top-strip">
+      <button onclick="window.location.href='/home'" style="background: none; border: none; color: white; font-size: 18px;">←</button>
       <span id="progress-indicator">0 / 0 files</span>
+      <div></div>
     </div>
-    <div class="swipe-area">
-      <div id="card-stack" class="card-stack"></div>
+    <div class="card-container">
+      <div id="card-stack" class="card-stack">
+        <!-- Cards will be populated by JS -->
+      </div>
       <div class="swipe-label delete">Delete</div>
       <div class="swipe-label keep">Keep</div>
     </div>
-    <div class="action-buttons">
-      <button id="delete-button" class="action-button delete">Delete</button>
-      <button id="keep-button" class="action-button keep">Keep</button>
+    <div class="footer-btns">
+      <button id="delete-button" class="action-btn delete">🗑️</button>
+      <button id="skip-button" class="action-btn skip">⏭️</button>
+      <button id="preview-button" class="action-btn preview">👁️</button>
+      <button id="keep-button" class="action-btn keep">✅</button>
     </div>
   </div>
   <script src="js/swipe.js"></script>

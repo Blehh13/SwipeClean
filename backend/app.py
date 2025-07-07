@@ -19,6 +19,34 @@ app.register_blueprint(cloud_bp, url_prefix='/api/cloud')
 def index():
     return send_from_directory('../frontend', 'index.html')
 
+@app.route('/home')
+def home():
+    return send_from_directory('../frontend', 'index.html')
+
+@app.route('/permissions')
+def permissions():
+    return send_from_directory('../frontend', 'permissions.html')
+
+@app.route('/swipe')
+def swipe():
+    return send_from_directory('../frontend', 'swipe.html')
+
+@app.route('/suggestions')
+def suggestions():
+    return send_from_directory('../frontend', 'suggestions.html')
+
+@app.route('/browser')
+def browser():
+    return send_from_directory('../frontend', 'browser.html')
+
+@app.route('/settings')
+def settings():
+    return send_from_directory('../frontend', 'settings.html')
+
+@app.route('/insights')
+def insights():
+    return send_from_directory('../frontend', 'insights.html')
+
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('../frontend', path)
@@ -32,7 +60,7 @@ def storage_info():
     })
 
 @app.route('/api/insights')
-def insights():
+def insights_api():
     return jsonify({
         'storageByCategory': {
             'photos': 8.2,

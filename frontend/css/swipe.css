@@ -1,3 +1,16 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #F3F4F6;
+  overflow: hidden;
+}
+
+.swipe-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .top-strip {
   height: 48px;
   background-color: #8B5CF6;
@@ -9,83 +22,152 @@
 }
 
 .card-container {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 112px);
-  padding: 16px;
+  position: relative;
+  padding: 20px;
+}
+
+.card-stack {
+  position: relative;
+  width: 300px;
+  height: 400px;
 }
 
 .card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 360px;
+  position: absolute;
   width: 100%;
-  position: relative;
+  height: 100%;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  cursor: grab;
 }
 
-.file-info {
+.card:active {
+  cursor: grabbing;
+}
+
+.card img, .card video {
+  width: 100%;
+  height: 70%;
+  object-fit: cover;
+}
+
+.card .file-info {
   padding: 16px;
+  height: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.file-info p {
+.card .file-info p {
   margin: 4px 0;
-}
-
-.file-info p:first-child {
-  font-weight: 700;
   font-size: 14px;
+  color: #374151;
 }
 
-.zoom-icon {
+.card.deleting {
+  transform: translateX(-100%) rotate(-30deg);
+  opacity: 0;
+}
+
+.card.keeping {
+  transform: translateX(100%) rotate(30deg);
+  opacity: 0;
+}
+
+.swipe-label {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 24px;
-  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.skip-text {
-  text-align: center;
-  color: #3B82F6;
-  font-size: 14px;
-  text-decoration: underline;
-  cursor: pointer;
-  margin: 8px 0;
+.swipe-label.delete {
+  left: 20px;
+  background-color: #EF4444;
+  color: white;
 }
 
-.undo-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background-color: #D1D5DB;
-  color: #4B5563;
-  border: none;
-  border-radius: 50%;
-  padding: 8px;
-  cursor: pointer;
+.swipe-label.keep {
+  right: 20px;
+  background-color: #10B981;
+  color: white;
+}
+
+.swipe-label.visible {
+  opacity: 1;
 }
 
 .footer-btns {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 48px;
+  height: 80px;
   background-color: white;
-  padding: 8px;
+  padding: 0 20px;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: none;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.action-btn.delete { background-color: #EF4444; }
-.action-btn.keep { background-color: #10B981; }
-.action-btn.skip { background-color: #F59E0B; }
-.action-btn.preview { background-color: #3B82F6; }
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-btn.delete { 
+  background-color: #EF4444; 
+  color: white;
+}
+
+.action-btn.keep { 
+  background-color: #10B981; 
+  color: white;
+}
+
+.action-btn.skip { 
+  background-color: #F59E0B; 
+  color: white;
+}
+
+.action-btn.preview { 
+  background-color: #3B82F6; 
+  color: white;
+}
+
+.no-files {
+  text-align: center;
+  color: #6B7280;
+  font-size: 18px;
+  padding: 40px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.swipe-container.active {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
