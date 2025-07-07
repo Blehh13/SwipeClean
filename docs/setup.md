@@ -36,7 +36,7 @@ source venv/bin/activate
 Install Python dependencies:
 
 ```bash
-pip install -r backend/requirements.txt
+python -m pip install -r backend/requirements.txt
 ```
 
 ### 3. Environment Configuration
@@ -127,7 +127,7 @@ docker-compose logs -f swipeclean-app
 1. **Install production dependencies:**
 
 ```bash
-pip install gunicorn
+python -m pip install gunicorn
 ```
 
 2. **Set production environment:**
